@@ -1,0 +1,55 @@
+<head>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css" integrity="sha384-vp86vTRFVJgpjF9jiIGPEEqYqlDwgyBgEF109VFjmqGmIY/Y4HV4d3Gp2irVfcrp" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<% let files =  []; %>
+
+<form action="/test<%= typeof q !== 'undefined' ? '?q=' + q : '' %>" method="GET">
+  <div class="container">
+    <div class="title">Meeting Search Engine</div>
+    <div class="search">
+      <i class="fa fa-search"></i>     
+      <input type="text" name="q" placeholder="Search in Database">
+    </div>
+    <button type="submit">Search</button>
+    <div class="columns-container">
+      <% if (typeof fileName !== 'undefined') { %>
+        <% files.push({ fileName, fileSymbol, fileType }); %>
+      <% } %>
+      <% for (let i = 0; i < files.length; i++) { %>
+        <div class="column">
+           <div class="file-name" style="margin-bottom: 28px;">Name</div>
+           <div class="file-name">
+              <% if (files[i].fileSymbol === 'pdf.png') { %>
+               <img src="pdf.png" alt="PDF">
+             <% } else if (files[i].fileSymbol === 'word.png') { %>
+               <img src="word.png" alt="Word Document">
+             <% } else { %>
+              <img src="image.png" alet="any">
+             <% } %>
+          
+         <div style="font-family: 'Raleway', sans-serif;">
+        <a href="#" onclick="showFile('<%= files[i].fileName %>')" class="file-link"><%= files[i].fileName %></a>
+      </div>
+
+           </div>
+        </div>
+        <div class="column">Last Modified</div>
+        <div class="column"> <div class="file-name" style="margin-bottom: 28px;">File Type</div>
+          <div class="file-name">
+            <%= files[i].fileType %>
+          </div>
+        </div>
+      <% } %>
+
+
+    </div>
+  </div>
+</form>
+
+    <script>
+            function showFile(fileName) {
+    window.open(`/database/${fileName}`, '_blank');
+  }
+</script>
