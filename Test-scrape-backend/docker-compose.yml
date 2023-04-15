@@ -1,0 +1,75 @@
+version : '3.3'
+services  :
+
+#Container - 3 - Database {Elastic Search}
+
+  FilesManager:
+    build: 
+    ports:
+     - "3004:3004"
+    networks:
+      - docnet  
+  
+  imagetext:
+    image: codait/max-image-caption-generator
+    networks:
+      - docnet  
+    ports:
+      - "5000:5000"      
+  audiotext:
+    image: onerahmet/openai-whisper-asr-webservice:latest  
+    ports:
+      - "9000:9000"
+    networks:
+      - docnet 
+  docman-Text-extractor:
+    container_name: Super-Text-extractor
+    image : logicalspark/docker-tikaserver
+    ports:
+      - "9998:9998"
+    networks:
+      - docnet         
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - Docman:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - docnet  
+
+#Conatiner -4 Database Visualization Tool {kibana}
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.6.2
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      - docnet  
+
+volumes:
+# For Conatiner 3 {elastic search}
+  Docman:
+
+networks:
+  docnet:  
+    driver: bridge    
